@@ -26,11 +26,9 @@ struct Namespace {
 struct Parent {
 	bool is_class { false };
 	unsigned long long end; // sibling address
-
 	unsigned long long start;
-	std::string decl_file;
-
 	std::string name;
+	std::string decl_file;
 
 	[[nodiscard]] bool inParent (
 		const unsigned long long loc
@@ -69,7 +67,7 @@ public:
 		const std::string_view exe_filename,
 		const std::string_view out_filename
 	) {
-		system(
+		system (
 			std::string("llvm-dwarfdump ").append(std::string(exe_filename.data()).append(std::string(" -o ").append(out_filename))).c_str()
 		);
 	}
