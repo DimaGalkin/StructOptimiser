@@ -1,10 +1,10 @@
 #pragma once
 
+#include <cstring>
 #include <string>
 #include <optional>
 #include <vector>
 #include <unordered_map>
-#include <format>
 #include <iostream>
 #include <ranges>
 #include <sstream>
@@ -70,11 +70,7 @@ public:
 		const std::string_view out_filename
 	) {
 		system(
-			std::format(
-				"llvm-dwarfdump {} -o {}",
-				exe_filename,
-				out_filename
-			).c_str()
+			std::string("llvm-dwarfdump ").append(std::string(exe_filename.data()).append(std::string(" -o ").append(out_filename))).c_str()
 		);
 	}
 
@@ -92,11 +88,11 @@ public:
 		for (auto& p : parents_) {
 			for (const auto& n : namespaces_) {
 				if (n.inNamespace(p.start)) {
-					p.name = std::format("{}::{}", n.name, p.name);
+					p.name = n.name + "::" + p.name;
 				}
 			}
 
-			p.name = std::format("{}@{}", p.decl_file, p.name);
+			p.name = p.decl_file + "@" + p.name;
 		}
 
 		namespaces_.clear();
@@ -172,7 +168,7 @@ public:
 			const size_t at_pos = name.find_first_of('@');
 
 			system (
-				std::format("clang-reorder-fields --record-name={} --fields-order={} -i {} --extra-arg=-std=c++23", name.substr(at_pos + 1), children, name.substr(0, at_pos))
+				std::string("clang-reorder-fields --record-name=" + name.substr(at_pos + 1) + " --fields-order=" + children +  " -i " + name.substr(0, at_pos) +  " --extra-arg=-std=c++23")
 				.c_str()
 			);
 		}
